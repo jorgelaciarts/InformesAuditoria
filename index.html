@@ -279,7 +279,7 @@ tbody tr:hover{background:#F5F6F8;}
   </div>
 
   <div class="toolbar">
-    <input type="text" id="fSearch" placeholder="Buscar causa u observación…">
+    <input type="text" id="fSearch" placeholder="Buscar causa…">
     <select id="fAuditor"><option value="">Todos los auditores</option></select>
     <select id="fEstado">
       <option value="">Todos los estados</option>
@@ -354,7 +354,6 @@ tbody tr:hover{background:#F5F6F8;}
         </div>
       </div>
       <div class="field"><label>Fecha enviado a jefatura</label><input type="date" id="fldFechaEnviado"></div>
-      <div class="field full"><label>Observación</label><textarea id="fldObs"></textarea></div>
       <div class="field full">
         <label>Archivo del informe (para revisión)</label>
         <div class="file-row">
@@ -478,7 +477,7 @@ function applyFilters(list){
     if(f.auditor && r.auditor !== f.auditor) return false;
     if(f.estado && r.estado !== f.estado) return false;
     if(f.q){
-      const hay = [r.causa,r.observacion,r.auditor].join(' ').toLowerCase();
+      const hay = [r.causa,r.auditor].join(' ').toLowerCase();
       if(!hay.includes(f.q)) return false;
     }
     return true;
@@ -738,7 +737,6 @@ function openModal(id){
   $('#fldModReembolso').checked = !!rec?.modificaReembolso;
   $('#fldEnviado').checked = !!rec?.enviadoJefatura;
   $('#fldFechaEnviado').value = rec?.fechaEnviado || '';
-  $('#fldObs').value = rec?.observacion || '';
   $('#fldArchivo').value = '';
   $('#curArchivo').textContent = rec?.archivoNombre ? `Actual: ${rec.archivoNombre}` : 'Sin archivo cargado';
   $('#btnQuitarArchivo').style.display = rec?.archivoNombre ? 'inline-block' : 'none';
@@ -775,8 +773,10 @@ async function saveModal(){
     modificaReembolso: $('#fldModReembolso').checked,
     enviadoJefatura: $('#fldEnviado').checked,
     fechaEnviado: $('#fldFechaEnviado').value,
-    observacion: $('#fldObs').value.trim(),
   });
+  if(rec.enviadoJefatura && rec.estado !== 'Terminado'){
+    rec.estado = 'Revision Jefatura';
+  }
   if(isNew) records.push(rec);
 
   if(pendingFile){
@@ -803,8 +803,8 @@ async function deleteRecord(){
 
 /* ===================== Export CSV ===================== */
 function exportCsv(){
-  const cols = ['causa','auditor','fechaAsignacion','estado','resultado','modificaInforme','modificaReembolso','enviadoJefatura','fechaEnviado','observacion','archivoNombre'];
-  const header = ['Causa','Auditor','Fecha asignación','Estado','Resultado','Modifica informe','Modifica reembolso','Enviado a jefatura','Fecha enviado','Observación','Archivo'];
+  const cols = ['causa','auditor','fechaAsignacion','estado','resultado','modificaInforme','modificaReembolso','enviadoJefatura','fechaEnviado','archivoNombre'];
+  const header = ['Causa','Auditor','Fecha asignación','Estado','Resultado','Modifica informe','Modifica reembolso','Enviado a jefatura','Fecha enviado','Archivo'];
   const rows = applyFilters(visibleRecords()).map(r=> cols.map(c=>{
     let v = r[c];
     if(typeof v === 'boolean') v = v ? 'Sí' : 'No';
