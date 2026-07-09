@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control de Recursos · TRICEL</title>
+<title>Control de Informes · Unidad de Contabilidad Electoral</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -60,7 +60,7 @@ body{
   width:52px;height:52px;border-radius:50%;
   border:2px solid var(--brass);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Source Serif 4', serif;font-weight:700;font-size:18px;
+  font-family:'Source Serif 4', serif;font-weight:700;font-size:14.5px;letter-spacing:.02em;
   color:var(--brass);flex:none;position:relative;
 }
 .seal::before{content:"";position:absolute;inset:4px;border:1px solid rgba(156,122,63,.5);border-radius:50%;}
@@ -74,21 +74,38 @@ body{
   color:#AEB6C6;font-size:12px;line-height:1.5;
 }
 .header .exp-count b{color:#EDEFF3;font-size:20px;display:block;font-family:'Source Serif 4',serif;}
-
-/* ---------- Stat cards ---------- */
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px;}
-.stat{
-  background:var(--paper-card);border:1px solid var(--line-soft);border-radius:var(--radius);
-  padding:14px 16px;box-shadow:var(--shadow);
-  position:relative;
+.userbar{
+  display:flex;align-items:center;gap:10px;margin-left:22px;padding-left:22px;
+  border-left:1px solid rgba(174,182,198,.35);
 }
-.stat .n{font-family:'Source Serif 4',serif;font-size:28px;font-weight:700;color:var(--ink);}
-.stat .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:2px;}
-.stat.accent-brass{border-left:3px solid var(--brass);}
-.stat.accent-green{border-left:3px solid var(--green);}
-.stat.accent-amber{border-left:3px solid var(--amber);}
-.stat.accent-ink{border-left:3px solid var(--ink);}
-.stat.accent-red{border-left:3px solid var(--red);}
+.userbar span{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#D6DAE2;white-space:nowrap;}
+.userbar .btn.secondary{
+  background:transparent;color:#EDEFF3;border-color:rgba(174,182,198,.5);padding:6px 10px;font-size:12px;
+}
+.userbar .btn.secondary:hover{background:rgba(255,255,255,.08);}
+
+/* ---------- Dashboard ---------- */
+.dashboard{
+  margin-top:14px;padding:18px 22px;background:var(--paper-card);
+  border:1px solid var(--line-soft);border-radius:var(--radius);box-shadow:var(--shadow);
+}
+.dashboard-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
+.dashboard-head h2{font-family:'Source Serif 4',serif;font-size:15.5px;font-weight:700;color:var(--ink);margin:0;}
+.dashboard-head span{font-size:11.5px;color:var(--muted);}
+.dashboard-body{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.dash-chart{position:relative;width:160px;height:160px;flex:none;}
+.dash-chart svg{width:160px;height:160px;display:block;}
+.dash-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.dash-center .num{font-family:'Source Serif 4',serif;font-size:26px;font-weight:700;color:var(--ink);line-height:1;}
+.dash-center .lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:3px;}
+.dash-legend{display:grid;grid-template-columns:repeat(2,minmax(160px,1fr));gap:6px 18px;flex:1;min-width:280px;}
+.dash-item{display:flex;align-items:center;gap:10px;cursor:pointer;padding:7px 9px;border-radius:3px;transition:background .12s ease;}
+.dash-item:hover{background:#F2F3F5;}
+.dash-item.dimmed{opacity:.4;}
+.dash-dot{width:11px;height:11px;border-radius:50%;flex:none;}
+.dash-item .txt{display:flex;flex-direction:column;line-height:1.3;}
+.dash-item .name{font-size:12.5px;font-weight:600;color:var(--ink);}
+.dash-item .cnt{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
 
 /* ---------- Toolbar ---------- */
 .toolbar{
@@ -226,7 +243,6 @@ tbody tr:hover{background:#F5F6F8;}
   .board{grid-template-columns:repeat(2,1fr);}
 }
 @media (max-width:900px){
-  .stats{grid-template-columns:repeat(2,1fr);}
   .board{grid-template-columns:1fr;}
   .modal-body{grid-template-columns:1fr;}
 }
@@ -236,20 +252,30 @@ tbody tr:hover{background:#F5F6F8;}
 <div class="wrap">
 
   <div class="header">
-    <div class="seal">TC</div>
+    <div class="seal">UCE</div>
     <div>
-      <h1>Control de Recursos TRICEL</h1>
+      <h1>Control de Informes Unidad de Contabilidad Electoral</h1>
       <p>Seguimiento de auditoría e informes de cuentas · candidatos electorales</p>
     </div>
     <div class="exp-count"><b id="statTotal">0</b>expedientes registrados</div>
+    <div class="userbar">
+      <span id="userbarLabel">Sin identificar</span>
+      <button class="btn secondary" id="btnSwitchUser" type="button">Cambiar usuario</button>
+    </div>
   </div>
 
-  <div class="stats">
-    <div class="stat accent-ink"><div class="n" id="stAsignado">0</div><div class="l">Asignados</div></div>
-    <div class="stat accent-amber"><div class="n" id="stProceso">0</div><div class="l">En proceso</div></div>
-    <div class="stat accent-brass"><div class="n" id="stJefatura">0</div><div class="l">En revisión jefatura</div></div>
-    <div class="stat accent-green"><div class="n" id="stTerminado">0</div><div class="l">Terminados</div></div>
-    <div class="stat accent-red"><div class="n" id="stArchivos">0</div><div class="l">Con archivo cargado</div></div>
+  <div class="dashboard" id="dashboard">
+    <div class="dashboard-head">
+      <h2>Estado de los informes</h2>
+      <span>Haz clic en un estado para filtrarlo</span>
+    </div>
+    <div class="dashboard-body">
+      <div class="dash-chart">
+        <svg viewBox="0 0 160 160" id="dashDonut"></svg>
+        <div class="dash-center" id="dashCenter"></div>
+      </div>
+      <div class="dash-legend" id="dashLegend"></div>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -319,22 +345,6 @@ tbody tr:hover{background:#F5F6F8;}
       </div>
       <datalist id="auditorList"></datalist>
       <div class="field"><label>Fecha de asignación</label><input type="date" id="fldFecha"></div>
-      <div class="field"><label>Estado</label>
-        <select id="fldEstado">
-          <option value="Asignado">Asignado</option>
-          <option value="En Proceso">En proceso</option>
-          <option value="Revision Jefatura">Revisión jefatura</option>
-          <option value="Terminado">Terminado</option>
-        </select>
-      </div>
-      <div class="field"><label>Resultado</label>
-        <select id="fldResultado">
-          <option>Pendiente</option>
-          <option>Acoge</option>
-          <option>Acoge Parcial</option>
-          <option>Rechaza</option>
-        </select>
-      </div>
       <div class="field full">
         <label>Detalle</label>
         <div class="checks">
@@ -360,6 +370,33 @@ tbody tr:hover{background:#F5F6F8;}
         <button class="btn secondary" id="btnCancel">Cancelar</button>
         <button class="btn brass" id="btnSave">Guardar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-head">
+      <h2>Identifícate</h2>
+    </div>
+    <div class="modal-body" style="grid-template-columns:1fr;">
+      <div class="field">
+        <label>Usuario</label>
+        <select id="loginUser">
+          <option value="">— Selecciona —</option>
+        </select>
+      </div>
+      <div class="field" id="loginPassField" style="display:none;">
+        <label>Contraseña</label>
+        <input type="password" id="loginPass">
+      </div>
+      <div id="loginError" style="display:none;color:var(--red);font-size:12.5px;">Contraseña incorrecta.</div>
+      <p style="font-size:11.5px;color:var(--muted);margin:0;">Los expedientes en "Revisión jefatura" solo son visibles para Jefatura y para el auditor asignado a cada uno.</p>
+    </div>
+    <div class="modal-foot">
+      <div></div>
+      <button class="btn brass" id="btnLogin">Ingresar</button>
     </div>
   </div>
 </div>
@@ -448,7 +485,91 @@ function applyFilters(list){
   });
 }
 
-const AUDITORES_EQUIPO = ['Felipe Sarabia','Julissa Lazo','Camila Chaparro','Jose Celedon','Ximena Valdebenito','Miguel Baeza'];
+// Clave de cada usuario: inicial del nombre + apellido completo (ej. Jorge Laciart -> JLaciart).
+// Las claves se guardan como hash SHA-256, nunca en texto plano.
+const USERS = [
+  {name:'Jorge Laciart',       role:'jefatura', hash:'974c6e2adb2a4ddfd564ce289335915393fc5ead80bd221e1e0c01f544436277'},
+  {name:'Felipe Sarabia',      role:'auditor',  hash:'17cd45306a58c89259e4e2b63bb754e235dffda65b56f8b42127ff409442b0cd'},
+  {name:'Julissa Lazo',        role:'auditor',  hash:'cd5af548eb0b80406d9aa597e80597a7e08ceacd72c79e3a462c96b55ebc4e9e'},
+  {name:'Camila Chaparro',     role:'auditor',  hash:'f7e67512f4647ec09a4daf3ddfcdcaf4b3d966b837600fff611caf63ed867954'},
+  {name:'Jose Celedon',        role:'auditor',  hash:'b99b36a15e53b78116abaae5f2a3777cf0700a171934a805654cd752d092077a'},
+  {name:'Ximena Valdebenito',  role:'auditor',  hash:'39ee2ea773ac829288a5e77d171c1b9cd1cd385571df5977b4a5ec9e44d85ea6'},
+  {name:'Miguel Baeza',        role:'auditor',  hash:'8e8f1bdfb433ecaa46c9234321f8c0feec92bd8f4510b8cbe529c6c5976d0489'},
+];
+const AUDITORES_EQUIPO = USERS.filter(u=>u.role==='auditor').map(u=>u.name);
+
+async function sha256Hex(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ===================== Sesión de usuario ===================== */
+// OJO: al ser una app 100% del navegador, aunque las claves se guardan
+// hasheadas (SHA-256), el código sigue siendo visible; no es una barrera
+// de seguridad real ante alguien con conocimientos técnicos.
+const USER_KEY = 'tricel_user_v1';
+
+function loadUser(){
+  try{ const raw = localStorage.getItem(USER_KEY); if(raw) return JSON.parse(raw); }
+  catch(e){ console.error('Error leyendo sesión', e); }
+  return null;
+}
+function saveUser(u){
+  try{ localStorage.setItem(USER_KEY, JSON.stringify(u)); }
+  catch(e){ console.error('No se pudo guardar la sesión', e); }
+}
+
+let currentUser = loadUser();
+
+function canSeeRecord(r){
+  if(r.estado !== 'Revision Jefatura') return true;
+  if(!currentUser) return false;
+  if(currentUser.role === 'jefatura') return true;
+  return currentUser.role === 'auditor' && currentUser.name === r.auditor;
+}
+function visibleRecords(){ return records.filter(canSeeRecord); }
+
+function updateUserbar(){
+  $('#userbarLabel').textContent = currentUser
+    ? `Sesión: ${currentUser.name}${currentUser.role==='jefatura' ? ' (Jefatura)' : ''}`
+    : 'Sin identificar';
+}
+function populateLoginOptions(){
+  const sel = $('#loginUser');
+  const users = USERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'es'));
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecciona —</option>'
+    + users.map(u=>`<option value="${esc(u.name)}">${esc(u.name)}${u.role==='jefatura' ? ' (Jefatura)' : ''}</option>`).join('');
+  sel.value = cur;
+}
+function openLogin(){
+  populateLoginOptions();
+  $('#loginUser').value = currentUser ? currentUser.name : '';
+  $('#loginPassField').style.display = 'flex';
+  $('#loginPass').value = '';
+  $('#loginError').style.display = 'none';
+  $('#loginOverlay').classList.add('show');
+}
+function closeLogin(){ $('#loginOverlay').classList.remove('show'); }
+
+$('#loginUser').addEventListener('change', ()=>{
+  $('#loginError').style.display = 'none';
+});
+$('#btnLogin').addEventListener('click', async ()=>{
+  const v = $('#loginUser').value;
+  if(!v){ alert('Selecciona un usuario.'); return; }
+  const user = USERS.find(u=>u.name===v);
+  if(!user){ alert('Usuario no válido.'); return; }
+  const enteredHash = await sha256Hex($('#loginPass').value);
+  if(enteredHash !== user.hash){ $('#loginError').style.display = 'block'; return; }
+  currentUser = {role:user.role, name:user.name};
+  saveUser(currentUser);
+  closeLogin();
+  updateUserbar();
+  renderAll();
+});
+$('#btnSwitchUser').addEventListener('click', openLogin);
+$('#loginOverlay').addEventListener('click', e=>{ if(e.target.id==='loginOverlay' && currentUser) closeLogin(); });
 
 function refreshFilterOptions(){
   const auditores = AUDITORES_EQUIPO.slice().sort((a,b)=>a.localeCompare(b,'es'));
@@ -460,14 +581,52 @@ function refreshFilterOptions(){
 }
 function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-/* ===================== Render estadísticas ===================== */
+/* ===================== Contador del header ===================== */
 function renderStats(){
-  $('#statTotal').textContent = records.length;
-  $('#stAsignado').textContent = records.filter(r=>r.estado==='Asignado').length;
-  $('#stProceso').textContent = records.filter(r=>r.estado==='En Proceso').length;
-  $('#stJefatura').textContent = records.filter(r=>r.estado==='Revision Jefatura').length;
-  $('#stTerminado').textContent = records.filter(r=>r.estado==='Terminado').length;
-  $('#stArchivos').textContent = records.filter(r=>r.archivoNombre).length;
+  $('#statTotal').textContent = visibleRecords().length;
+}
+
+/* ===================== Render Dashboard ===================== */
+const ESTADO_COLOR = {'Asignado':'#152238','En Proceso':'#8A6A1E','Revision Jefatura':'#9C7A3F','Terminado':'#3F6C51'};
+function renderDashboard(){
+  const vis = visibleRecords();
+  const total = vis.length;
+  const order = ['Asignado','En Proceso','Revision Jefatura','Terminado'];
+  const label = {'Asignado':'Asignado','En Proceso':'En proceso','Revision Jefatura':'Revisión jefatura','Terminado':'Terminado'};
+  const data = order.map(e=>({estado:e, label:label[e], color:ESTADO_COLOR[e], count:vis.filter(r=>r.estado===e).length}));
+  const activeEstado = $('#fEstado').value;
+
+  const cx=80, cy=80, r=60, sw=24, circ=2*Math.PI*r;
+  let acc = 0, segs;
+  if(total===0){
+    segs = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E2E4E9" stroke-width="${sw}"/>`;
+  } else {
+    segs = data.filter(d=>d.count>0).map(d=>{
+      const len = (d.count/total)*circ;
+      const dashoffset = -acc;
+      acc += len;
+      const dim = activeEstado && activeEstado!==d.estado ? 0.3 : 1;
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${sw}" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${dashoffset}" opacity="${dim}" style="transition:opacity .15s ease;"/>`;
+    }).join('');
+  }
+  $('#dashDonut').innerHTML = `<g transform="rotate(-90 ${cx} ${cy})">${segs}</g>`;
+  $('#dashCenter').innerHTML = `<div class="num">${total}</div><div class="lbl">Expedientes</div>`;
+
+  $('#dashLegend').innerHTML = data.map(d=>{
+    const pct = total ? Math.round((d.count/total)*100) : 0;
+    const dimmed = activeEstado && activeEstado!==d.estado ? 'dimmed' : '';
+    return `<div class="dash-item ${dimmed}" data-estado="${d.estado}">
+      <span class="dash-dot" style="background:${d.color};"></span>
+      <span class="txt"><span class="name">${d.label}</span><span class="cnt">${d.count} expediente${d.count===1?'':'s'} · ${pct}%</span></span>
+    </div>`;
+  }).join('');
+  $$('#dashLegend .dash-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const est = item.dataset.estado;
+      $('#fEstado').value = ($('#fEstado').value === est) ? '' : est;
+      renderAll();
+    });
+  });
 }
 
 /* ===================== Render Kanban ===================== */
@@ -475,7 +634,7 @@ const ESTADOS = ['Asignado','En Proceso','Revision Jefatura','Terminado'];
 const ESTADO_LABEL = {'Asignado':'Asignado','En Proceso':'En proceso','Revision Jefatura':'Revisión jefatura','Terminado':'Terminado'};
 function renderBoard(){
   const board = $('#board');
-  const filtered = applyFilters(records);
+  const filtered = applyFilters(visibleRecords());
   board.innerHTML = ESTADOS.map(estado=>{
     const items = filtered.filter(r=>r.estado===estado);
     const cards = items.map(r=>cardHtml(r)).join('') || '<div class="empty-col">Sin expedientes</div>';
@@ -527,7 +686,7 @@ function cardHtml(r){
 /* ===================== Render Tabla ===================== */
 let sortKey = 'causa', sortDir = 1;
 function renderTable(){
-  const filtered = applyFilters(records).slice().sort((a,b)=>{
+  const filtered = applyFilters(visibleRecords()).slice().sort((a,b)=>{
     const va = (a[sortKey]||'').toString(), vb = (b[sortKey]||'').toString();
     return va.localeCompare(vb, 'es', {numeric:true}) * sortDir;
   });
@@ -562,6 +721,7 @@ async function downloadFile(id){
 function renderAll(){
   refreshFilterOptions();
   renderStats();
+  renderDashboard();
   if(currentView==='kanban') renderBoard(); else renderTable();
 }
 
@@ -574,8 +734,6 @@ function openModal(id){
   $('#fldCausa').value = rec?.causa || '';
   $('#fldAuditor').value = rec?.auditor || '';
   $('#fldFecha').value = rec?.fechaAsignacion || new Date().toISOString().slice(0,10);
-  $('#fldEstado').value = rec?.estado || 'Asignado';
-  $('#fldResultado').value = rec?.resultado || 'Pendiente';
   $('#fldModInforme').checked = !!rec?.modificaInforme;
   $('#fldModReembolso').checked = !!rec?.modificaReembolso;
   $('#fldEnviado').checked = !!rec?.enviadoJefatura;
@@ -608,13 +766,11 @@ async function saveModal(){
   if(!causa){ alert('Ingresa el N° de causa.'); return; }
   let rec = editingId ? records.find(r=>r.id===editingId) : null;
   const isNew = !rec;
-  if(isNew){ rec = { id: nextId() }; }
+  if(isNew){ rec = { id: nextId(), estado: 'Asignado', resultado: 'Pendiente' }; }
   Object.assign(rec, {
     causa,
     auditor: $('#fldAuditor').value.trim(),
     fechaAsignacion: $('#fldFecha').value,
-    estado: $('#fldEstado').value,
-    resultado: $('#fldResultado').value,
     modificaInforme: $('#fldModInforme').checked,
     modificaReembolso: $('#fldModReembolso').checked,
     enviadoJefatura: $('#fldEnviado').checked,
@@ -649,7 +805,7 @@ async function deleteRecord(){
 function exportCsv(){
   const cols = ['causa','auditor','fechaAsignacion','estado','resultado','modificaInforme','modificaReembolso','enviadoJefatura','fechaEnviado','observacion','archivoNombre'];
   const header = ['Causa','Auditor','Fecha asignación','Estado','Resultado','Modifica informe','Modifica reembolso','Enviado a jefatura','Fecha enviado','Observación','Archivo'];
-  const rows = applyFilters(records).map(r=> cols.map(c=>{
+  const rows = applyFilters(visibleRecords()).map(r=> cols.map(c=>{
     let v = r[c];
     if(typeof v === 'boolean') v = v ? 'Sí' : 'No';
     v = (v ?? '').toString().replace(/"/g,'""');
@@ -658,7 +814,7 @@ function exportCsv(){
   const csv = [header.join(','), ...rows].join('\n');
   const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='control_recursos_tricel.csv';
+  const a = document.createElement('a'); a.href=url; a.download='control_informes_uce.csv';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),4000);
 }
@@ -698,6 +854,8 @@ $$('thead th[data-k]').forEach(th=>{
 (async function init(){
   try{ db = await openDB(); }
   catch(e){ console.error('IndexedDB no disponible', e); }
+  updateUserbar();
+  if(!currentUser) openLogin();
   renderAll();
 })();
 </script>
